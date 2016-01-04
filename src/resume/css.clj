@@ -129,7 +129,7 @@
 (cljss/defrules colors
   (cljss/css-comment "----- colors -------------")
 
-  [:body :background-color :#EEE]
+  ;[:body :background-color :#EEE]
   [:section :background-color :#FFFFFF]
 
   )
