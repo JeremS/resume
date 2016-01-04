@@ -2,23 +2,35 @@
   (:require
    [cljss.core :as cljss]
    [cljss.units.length :as len]
-   [cljss.grid :as grid]))
+   [cljss.grid :as grid]
+   [cljss.parse]))
 
+(defmethod cljss.parse/consume-properties clojure.lang.IPersistentSet [[fst scd & rst] node]
+  (let [new-props (zipmap fst (repeat scd))]
+    (cljss.parse/consume-properties (cons new-props rst) node)))
 
 (def base-font-size 1)
-
+(def font-headings "\"Helvetica Neue\", Helvetica, Arial, sans-serif")
+(def font-text "Georgia, \"Times New Roman\", Times, serif")
 
 (cljss/defrules typo
   (cljss/css-comment "----- Typography -------------")
 
-  [:body :font-size (len/em 1.1)]
+
+  [:body
+     :font-size (len/em 1.1)
+     :font-family font-text]
+
+  [#{:h1 :h2 :h3 :h4 :h5} :font-family font-headings]
+
+
 
   [:h1
-       :font-size (len/em 2)
-       :text-align :center
+     :font-size (len/em 2)
+     :text-align :center
 
-       [:.p-summary
-            :font-size (len/em 0.666)]]
+   [:.p-summary
+      :font-size (len/em 0.666)]]
 
   [:h2 :font-size (len/em 1.5)]
 
@@ -127,19 +139,5 @@
   typo
   colors
   layout)
-
-
-
-
-
-(defn compile-rules []
-  (cljss/css all-rules))
-
-
-(defn make-rules []
-  (spit "out/style.css"
-        (compile-rules)))
-
-;(make-rules)
 
 
