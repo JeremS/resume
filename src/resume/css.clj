@@ -202,6 +202,10 @@
   [#{:h1 :h2 :h3}
    :color violet]
 
+  [:hr
+   :color orange
+   :background-color orange]
+
   )
 
 
