@@ -66,7 +66,7 @@
              (en/add-class (info-classes))
              (en/append (info-children)))
 
-               [:#skills] (en/append (skills))
+  [:#skills] (en/append (skills))
 
   [:#experience] (en/append (experience))
 
