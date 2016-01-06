@@ -59,11 +59,14 @@
            (apply en/add-class classes)))
 
 (defn info-children [] (-> (info) first :content))
+(defn info-classes [] (-> (info) first :attrs :class))
 
 (en/defsnippet resume "index.html" [:html] []
-  [:#info]  (en/append (info-children))
+  [:#info] (en/do->
+             (en/add-class (info-classes))
+             (en/append (info-children)))
 
-  [:#skills] (en/append (skills))
+               [:#skills] (en/append (skills))
 
   [:#experience] (en/append (experience))
 
