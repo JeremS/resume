@@ -42,13 +42,15 @@
   [[:#info :h1 :.p-name]
      :font-size h3-size]
 
-  [#{:.p-description [:#interests :ul :li :ul :li]}
-     :text-align :justify]
+  [[#{:#experience :#education} :header :+ :div :a]
+   :font-size h2-size]
 
   [[:#skills :ul :li #{:h3 [:ul :li]}]
-   ;:background-color :red
-   :text-align :center]
-  )
+     :text-align :center]
+
+  [#{:.p-description
+     [:#interests :ul :li :ul :li]}
+     :text-align :justify])
 
 
 (def g (grid/make-grid len/px 30 10))
@@ -157,10 +159,16 @@
 
      [[:header :+ :div]
         :position :relative
+        :height (* 3 base-font-size)
         (column g left-pane-span)
         (grid/pull g left-pane-span)
-        :height (* 3 base-font-size)
+        :bottom (+ base-font-size half-break)
 
+
+        [:.p-location
+           :display :block
+           :position :relative
+           :top half-break]
         [[:+ :div]
            :position :relative
            :bottom (* 3 base-font-size)]]]
