@@ -1,15 +1,27 @@
 (ns resume.css
+  (:refer-clojure :exclude [+ - * /])
   (:require
    [cljss.core :as cljss]
    [cljss.units.length :as len]
    [cljss.grid :as grid]
-   [cljss.parse]))
+   [cljss.units.colors :as color :refer [rgba]]
+   [cljss.parse]
+   [clojure.algo.generic.arithmetic :as gen :refer [+ - * /]]))
 
 (defmethod cljss.parse/consume-properties clojure.lang.IPersistentSet [[fst scd & rst] node]
   (let [new-props (zipmap fst (repeat scd))]
     (cljss.parse/consume-properties (cons new-props rst) node)))
 
-(def base-font-size 1)
+
+(def base-font-size (len/rem 1))
+
+(def h1-size (len/rem 2))
+(def h2-size (len/rem 1.1))
+(def h3-size (len/rem 1.2))
+
+
+
+
 (def font-headings "\"Helvetica Neue\", Helvetica, Arial, sans-serif")
 (def font-text "Georgia, \"Times New Roman\", Times, serif")
 
@@ -18,29 +30,27 @@
 
 
   [:body
-     :font-size (len/em 1.1)
+     :font-size base-font-size
      :font-family font-text]
 
   [#{:h1 :h2 :h3 :h4 :h5} :font-family font-headings]
 
+  (map #(vector %1 :font-size %2)
+        [:h1 :h2 :h3]
+        [h1-size h2-size h3-size])
 
+  [[:#info :h1 :.p-name]
+     :font-size h3-size]
 
-  [:h1
-     :font-size (len/em 2)
-     :text-align :center
+  [[#{:#experience :#education} :header :+ :div :a]
+   :font-size h2-size]
 
-   [:.p-summary
-      :font-size (len/em 0.666)]]
+  [[:#skills :ul :li #{:h3 [:ul :li]}]
+     :text-align :center]
 
-  [:h2 :font-size (len/em 1.5)]
-
-  [:h3 :font-size (len/em 1)]
-
-  [:p :text-align :justify]
-
-  [[:#info :figure] :text-align :center]
-
-  )
+  [#{:.p-description
+     [:#interests :ul :li :ul :li]}
+     :text-align :justify])
 
 
 (def g (grid/make-grid len/px 30 10))
@@ -55,89 +65,153 @@
   (-> of (* mult) (/ div)))
 
 
-(def left-margin (fraction column-number 2 8))
+(def left-pane-span (fraction column-number 2 8))
+(def main-pane-span (fraction column-number 6 8))
+
+(def break-base base-font-size)
+(def half-break (/ break-base 2.0))
+
+(defn break [break-height]
+  (list :margin-bottom break-height))
+
+(def left-pane
+  #{[:#info :h1 :.p-name]
+    [:#info :figure]})
+
+(def main-pane
+  #{:#skills :#experience :#education :#interests :hr})
+
+(def main-title [:#info :h1 :.p-summary])
+
+
+(defn even-odd-children-style [e o]
+  (list
+    [(cljss/nth-child cljss/& :even) e]
+    [(cljss/nth-child cljss/& :odd)  o]))
 
 
 (cljss/defrules layout
   (cljss/css-comment "----- Layout -------------")
-
   [:body
-     :width (grid/general-width g column-number)
-     :margin-left :auto
-     :margin-right :auto]
+   :width (grid/general-width g column-number)
+   :margin-left :auto
+   :margin-right :auto]
 
-  [:section
-     :margin-bottom (len/em 1)
-     grid/container-mixin
-     grid/clearfixed]
+  [main-title
+     (column g column-number)
+     :display :block
+     :margin-top base-font-size
+     :margin-bottom base-font-size]
+
+  [left-pane
+
+     :float :left
+     :clear :left
+     :position :relative
+     :top (* 3 base-font-size)
+     (column g left-pane-span)]
+
+  [main-pane
+   :float :right
+   (column g main-pane-span)
+
+   :margin-bottom base-font-size]
+
+  [[:#info :figure :address]
+     :margin-top half-break
+     :display :block
+     (break half-break)]
+
+  [[:#info :figure "div:not(:last-child)"]
+   (break half-break)]
 
   [:h2
-     (column g column-number)
-     :margin-bottom (len/em 0.75)]
+     (column g main-pane-span)
+     grid/alpha
+     grid/omega
+     :text-align :center
+     (break half-break)]
 
-  [:#info
-     [#{:.p-name :.p-summary :figure }
-        (grid/semantic-column g 24)]]
+  [[:#skills :> :ul]
+     :display :flex
+     :flex-wrap :wrap
 
-  [[:#skills :> :ul :> :li]
-     (column g 8)
-     :display :block
-     :float :left
-     :margin-bottom (len/em 1)]
+   [[:> :li]
+      (break half-break)
+      (column g (fraction main-pane-span 1 2))
+      (even-odd-children-style grid/omega grid/alpha )
+
+      [:ul
+         [:li
+            (column g (fraction main-pane-span 1 2))
+            grid/alpha
+            grid/omega]]]]
 
   [#{:#experience :#education}
-   [[:ol :> :li]
-      :margin-bottom (len/em 1)
 
-    [:h3
-       (column g 8)
-       (grid/semantic-push g left-margin)]
+     [[:> :ol :> :li]
+        (break half-break)]
 
-    [:.dt-duration
-       (grid/semantic-column g (fraction column-number 2 8))
-       :position :relative
-       :bottom (len/em 1)
-     ]
+     [:header
+        :display :flex
+        :justify-content :space-between
+      (break half-break)]
 
-    [[:> :.h-card]
-       (grid/semantic-column g 10)
-       (grid/semantic-push g 8)
-       :bottom (len/em 1)]
+     [[:header :+ :div]
+        :position :relative
+        :height (* 3 base-font-size)
+        (column g left-pane-span)
+        (grid/pull g left-pane-span)
+        :bottom (+ base-font-size half-break)
 
-    [:.p-location
-       (column g (fraction column-number 2 8))
-       :display :block
-       :position :relative
-       :bottom (len/em 1)]
 
-    [:.p-description ;:background-color :purple
-       (grid/semantic-column g (fraction column-number 6 8))
-       (grid/semantic-push g left-margin)
-       :bottom (len/em 2)
+        [:.p-location
+           :display :block
+           :position :relative
+           :top half-break]
+        [[:+ :div]
+           :position :relative
+           :bottom (* 3 base-font-size)]]]
 
-       [:ul :list-style-type :circle]
-     ]]]
-
-  [[:#interests :> :ul]
-     (column g column-number)
-     [[:> :li ]
-        :margin-bottom (len/em 1)]
+  [[:#interests :> :ul :li :ul]
+   :display :block
+   (break half-break)
    ]
   )
 
+; color palette from https://color.adobe.com/fr/1920-Leyendecker-color-theme-2522272/
+(def beige  (rgba "#ECDFBD"))
+(def blue   (rgba "#20457C"))
+(def brown  (rgba "#3B3A35"))
+(def orange (rgba "#FB6648"))
+(def violet (rgba "#5E3448"))
 
-(cljss/defrules colors
+(cljss/defrules embelishings
   (cljss/css-comment "----- colors -------------")
 
-  ;[:body :background-color :#EEE]
-  [:section :background-color :#FFFFFF]
+
+
+  [:body
+   :background-color (color/lighten beige 5)
+   :color brown]
+
+  [#{:a (cljss/visited :a)}
+     :color blue
+     :text-decoration :none]
+
+  [#{:h1 :h2 :h3}
+   :color violet]
+
+  [:hr
+   :color orange
+   :background-color orange]
 
   )
 
 
 (cljss/defrules all-rules
   typo
-  colors
+  embelishings
   layout)
 
 

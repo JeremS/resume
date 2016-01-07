@@ -1,2 +1,2 @@
  (ns user
-   (:require [resume.core :refer [compile-dev]]))
+   (:require [resume.core :refer [compile-dev compile-resume]]))
