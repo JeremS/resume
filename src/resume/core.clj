@@ -13,7 +13,7 @@
 (def dest-css "out/css/style.css")
 (def dest-reset "out/css/html-doctor.css")
 (def dest-html-dev "out/resume.html")
-(def dest-html "out/resumec.html")
+(def dest-html (str (System/getProperty "user.dir") "/resume.html"))
 
 (defn reset-css []
   (slurp reset-css-path))
@@ -85,14 +85,13 @@
 
 
 (defn compile-resume []
-  (make-out-directories)
   (spit dest-html (compile-snippet (resume-with-inline-headers))))
 
 
+(defn -main [& args]
+  (compile-resume))
+
 (comment
-  (->  "out"
-       (io/as-file )
-       (.exists))
 
   (compile-dev)
   (compile-resume))

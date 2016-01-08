@@ -12,8 +12,9 @@
 
 
 
-  :clean-targets [:target-path "out"]
+  :clean-targets [:target-path "out" "resume.html"]
 
+  :main resume.core
 
   :profiles {:dev {:dependencies [[org.clojure/clojurescript "1.7.170"]]
 
