@@ -94,8 +94,11 @@ h3 {
 #education header + div a {
   font-size: 1.1rem;
 }
-#skills ul li ul li, 
 #skills ul li h3 {
+  font-size: 1.1rem;
+}
+#skills ul li h3, 
+#skills ul li ul li {
   text-align: center;
 }
 .p-description, 
@@ -120,6 +123,12 @@ h3 {
 hr {
   color: rgba(251,102,72,1.0);
   background-color: rgba(251,102,72,1.0);
+}
+@media not print {
+  h2 {
+    padding-top: 0.5rem;
+    border-top: 1px dotted rgba(251,102,72,1.0);
+  }
 }
 /* ----- Layout ------------- */
 body {
@@ -205,7 +214,7 @@ h2 {
 #experience header + div, 
 #education header + div {
   position: relative;
-  height: 3rem;
+  height: 2rem;
   margin-left: 5px;
   margin-right: 5px;
   width: 230px;
@@ -221,7 +230,7 @@ h2 {
   #experience header + div + div, 
   #education header + div + div {
     position: relative;
-    bottom: 3rem;
+    bottom: 2rem;
   }
 #interests > ul li ul {
   display: block;
@@ -299,7 +308,7 @@ h2 {
         </ul>
 </li></ul></section>
 
-        <hr />
+
         <section id="experience">
             <h2>Expérience</h2>
         <ol class="vcalendar">
@@ -365,7 +374,6 @@ h2 {
     </li>
 </ol></section>
 
-        <hr />
         <section id="education">
             <h2>Cursus</h2>
         <ol class="vcalendar">
@@ -400,7 +408,6 @@ h2 {
     </li>
 </ol></section>
 
-        <hr />
         <section id="interests">
             <h2>Intérets</h2>
         <ul>

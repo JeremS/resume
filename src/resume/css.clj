@@ -6,7 +6,7 @@
    [cljss.grid :as grid]
    [cljss.units.colors :as color :refer [rgba]]
    [cljss.parse]
-   [clojure.algo.generic.arithmetic :as gen :refer [+ - * /]]))
+   [clojure.algo.generic.arithmetic :refer [+ - * /]]))
 
 (defmethod cljss.parse/consume-properties clojure.lang.IPersistentSet [[fst scd & rst] node]
   (let [new-props (zipmap fst (repeat scd))]
@@ -27,8 +27,6 @@
 
 (cljss/defrules typo
   (cljss/css-comment "----- Typography -------------")
-
-
   [:body
      :font-size base-font-size
      :font-family font-text]
@@ -45,8 +43,12 @@
   [[#{:#experience :#education} :header :+ :div :a]
    :font-size h2-size]
 
-  [[:#skills :ul :li #{:h3 [:ul :li]}]
-     :text-align :center]
+  [[:#skills :ul :li]
+     [:h3
+        :font-size h2-size]
+
+     [#{:h3 [:ul :li]}
+        :text-align :center]]
 
   [#{:.p-description
      [:#interests :ul :li :ul :li]}
@@ -104,7 +106,6 @@
      :margin-bottom base-font-size]
 
   [left-pane
-
      :float :left
      :clear :left
      :position :relative
@@ -148,7 +149,6 @@
             grid/omega]]]]
 
   [#{:#experience :#education}
-
      [[:> :ol :> :li]
         (break half-break)]
 
@@ -159,7 +159,7 @@
 
      [[:header :+ :div]
         :position :relative
-        :height (* 3 base-font-size)
+        :height (* 2 base-font-size)
         (column g left-pane-span)
         (grid/pull g left-pane-span)
         :bottom (+ base-font-size half-break)
@@ -171,7 +171,7 @@
            :top half-break]
         [[:+ :div]
            :position :relative
-           :bottom (* 3 base-font-size)]]]
+           :bottom (* 2 base-font-size)]]]
 
   [[:#interests :> :ul :li :ul]
    :display :block
@@ -206,8 +206,10 @@
    :color orange
    :background-color orange]
 
-  )
-
+  (cljss/media "not print"
+    [:h2
+     :padding-top half-break
+     :border-top [(len/px 1) :dotted orange]]))
 
 (cljss/defrules all-rules
   typo
